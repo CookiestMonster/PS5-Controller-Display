@@ -1,4 +1,7 @@
 /* === PS5 Controller CSS === */
+:root {
+    --img: "https://justehcupcake.github.io/PS5_Display_Pics/";
+}
 
 /* === CUSTOM PROPERTIES === */
 .ds4 {
