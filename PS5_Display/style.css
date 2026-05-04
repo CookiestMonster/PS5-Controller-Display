@@ -155,24 +155,16 @@
 
 .ds4 .button {
     position: absolute;
+    background: url(Buttons.png);
     width: 56px;
     height: 56px;
-    /* NO background url here */
+    opacity: 0;
 }
 
 .ds4 .button.pressed {
-    background: url(Buttons.png); /* only load sprite when pressed */
+    opacity: var(--pressed-opacity);
     background-position-y: 55px;
-}
-
-.ds4 .face {
-    position: absolute;
-    /* NO background url here */
-}
-
-.ds4 .face.pressed {
-    background: url(DPad.png); /* only load sprite when pressed */
-    background-position-y: 52px;
+    filter: brightness(1.5);
 }
 
 .ds4 .a { background-position: 0 0;       bottom: 0;   left: 57px; }
