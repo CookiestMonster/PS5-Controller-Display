@@ -1,4 +1,11 @@
 /* === PS5 Controller CSS === */
+.controller.ds4 {
+    background: url(Black_SkinNo_Buttons.png);
+    height: 700px;
+    width: 1200px;
+    /*    margin-left: -403px;
+        margin-top: -280px;*/
+}
 
 /* === CUSTOM PROPERTIES === */
 .ds4 {
@@ -16,13 +23,6 @@
         opacity var(--transition-speed),
         transform var(--transition-speed),
         background-position var(--transition-speed);
-}
-
-/* === BASE CONTROLLER === */
-.controller.ds4 {
-    background: url(Black_SkinNo_Buttons.png);
-    height: 700px;
-    width: 1200px;
 }
 
 /* === DISCONNECTED STATE === */
