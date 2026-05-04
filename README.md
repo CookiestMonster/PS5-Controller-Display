@@ -1,26 +1,26 @@
 /* === PS5 Controller CSS === */
 
+/* === CUSTOM PROPERTIES === */
+.ds4 {
+    --transition-speed: 0.08s ease-out;
+    --pressed-brightness: 1.3;
+    --pressed-opacity: 0.9;
+}
+
 /* === TRANSITIONS === */
-.ds4 .trigger,
-.ds4 .bumper,
-.ds4 .face,
-.ds4 .stick,
-.ds4 .back,
-.ds4 .start,
-.ds4 .meta,
-.ds4 .touchpad,
-.ds4 .button {
-    transition: 
-        filter 0.08s ease-out,
-        opacity 0.08s ease-out,
-        transform 0.08s ease-out,
-        background-position 0.08s ease-out;
+.ds4 .trigger, .ds4 .bumper, .ds4 .face,
+.ds4 .stick, .ds4 .back, .ds4 .start,
+.ds4 .meta, .ds4 .touchpad, .ds4 .button {
+    transition:
+        filter var(--transition-speed),
+        opacity var(--transition-speed),
+        transform var(--transition-speed),
+        background-position var(--transition-speed);
 }
 
 /* === BASE CONTROLLER === */
 .controller.ds4 {
-    background: url(Black_SkinNo_Buttons.png) no-repeat center;
-    background-size: contain;
+    background: url(Black_SkinNo_Buttons.png) no-repeat center / contain;
     height: 700px;
     width: 1200px;
     position: relative;
@@ -46,22 +46,15 @@
 .ds4 .trigger {
     width: 99px;
     height: 100%;
-    background: url(Trigger_Pressed.png) no-repeat;
-    background-size: cover;
+    background: url(Trigger_Pressed.png) no-repeat / cover;
     opacity: 0;
 }
 
-.ds4 .trigger.left {
-    float: left;
-}
-
-.ds4 .trigger.right {
-    float: right;
-    background-position-x: 99px;
-}
+.ds4 .trigger.left  { float: left; }
+.ds4 .trigger.right { float: right; background-position-x: 99px; }
 
 .ds4 .trigger.pressed {
-    opacity: 0.9;
+    opacity: var(--pressed-opacity);
     filter: brightness(1.2);
 }
 
@@ -77,29 +70,19 @@
 .ds4 .bumper {
     width: 200px;
     height: 45px;
-    background: url(Bumper.png) no-repeat;
-    background-size: contain;
+    background: url(Bumper.png) no-repeat / contain;
     opacity: 0;
 }
 
-.ds4 .bumper.left {
-    float: left;
-}
-
-.ds4 .bumper.right {
-    float: right;
-    transform: rotateY(180deg);
-}
+.ds4 .bumper.left  { float: left; }
+.ds4 .bumper.right { float: right; transform: rotateY(180deg); }
 
 .ds4 .bumper.pressed {
-    opacity: 0.9;
-    filter: brightness(1.3);
+    opacity: var(--pressed-opacity);
+    filter: brightness(var(--pressed-brightness));
     transform: translateY(2px);
 }
-
-.ds4 .bumper.right.pressed {
-    transform: rotateY(180deg) translateY(2px);
-}
+.ds4 .bumper.right.pressed { transform: rotateY(180deg) translateY(2px); }
 
 /* === TOUCHPAD === */
 .ds4 .touchpad {
@@ -109,14 +92,12 @@
     left: 422px;
     top: 74px;
 }
-
 .ds4 .touchpad.pressed {
-    background: url(Touchpad.png) no-repeat center;
-    background-size: contain;
-    filter: brightness(1.3);
+    background: url(Touchpad.png) no-repeat center / contain;
+    filter: brightness(var(--pressed-brightness));
 }
 
-/* === META/HOME BUTTON === */
+/* === META / HOME BUTTON === */
 .ds4 .meta {
     width: 100px;
     height: 100px;
@@ -125,11 +106,9 @@
     bottom: 264px;
     border-radius: 50%;
 }
-
 .ds4 .meta.pressed {
-    background: url(Home.png) no-repeat center;
-    background-size: contain;
-    filter: brightness(1.3);
+    background: url(Home.png) no-repeat center / contain;
+    filter: brightness(var(--pressed-brightness));
 }
 
 /* === PLAYER INDICATORS === */
@@ -148,46 +127,17 @@
 }
 
 .ds4 .face {
-    background-image: url(DPad.png);
-    background-repeat: no-repeat;
+    background: url(DPad.png) no-repeat;
     position: absolute;
 }
 
-.ds4 .face.up,
-.ds4 .face.down {
-    width: 36px;
-    height: 52px;
-}
+.ds4 .face.up, .ds4 .face.down { width: 36px; height: 52px; }
+.ds4 .face.left, .ds4 .face.right { width: 52px; height: 36px; }
 
-.ds4 .face.left,
-.ds4 .face.right {
-    width: 52px;
-    height: 36px;
-}
-
-.ds4 .face.up {
-    left: 44px;
-    top: 0;
-    background-position: -37px 0;
-}
-
-.ds4 .face.down {
-    left: 44px;
-    bottom: 0;
-    background-position: 0 0;
-}
-
-.ds4 .face.left {
-    top: 45px;
-    left: 0;
-    background-position: 104px 0;
-}
-
-.ds4 .face.right {
-    top: 45px;
-    right: 0;
-    background-position: 52px 0;
-}
+.ds4 .face.up    { left: 44px; top: 0;    background-position: -37px 0; }
+.ds4 .face.down  { left: 44px; bottom: 0; background-position: 0 0; }
+.ds4 .face.left  { top: 45px; left: 0;   background-position: 104px 0; }
+.ds4 .face.right { top: 45px; right: 0;  background-position: 52px 0; }
 
 .ds4 .face.pressed {
     background-position-y: 52px;
@@ -205,65 +155,35 @@
 
 .ds4 .button {
     position: absolute;
-    background-image: url(Buttons.png);
-    background-repeat: no-repeat;
+    background: url(Buttons.png) no-repeat;
     width: 50px;
     height: 50px;
 }
-
 .ds4 .button.pressed {
     background-position-y: 55px;
     filter: brightness(1.5);
 }
 
-.ds4 .a {
-    background-position: 0 0;
-    bottom: 0;
-    left: 58px;
-}
+.ds4 .a { background-position: 0 0;      bottom: 0;   left: 58px; }
+.ds4 .b { background-position: -57px 0;  top: 57px;   right: -3px; }
+.ds4 .x { background-position: -113px 0; top: 57px;   left: 0; }
+.ds4 .y { background-position: 55px 0;   top: 0;      left: 58px; }
 
-.ds4 .b {
-    background-position: -57px 0;
-    top: 57px;
-    right: -3px;
-}
-
-.ds4 .x {
-    background-position: -113px 0;
-    top: 57px;
-    left: 0;
-}
-
-.ds4 .y {
-    background-position: 55px 0;
-    left: 58px;
-    top: 0;
-}
-
-/* === START/SELECT BUTTONS === */
-.ds4 .back,
-.ds4 .start {
-    background: url(Select.png) no-repeat;
-    background-size: contain;
+/* === START / SELECT BUTTONS === */
+.ds4 .back, .ds4 .start {
+    background: url(Select.png) no-repeat / contain;
     width: 26px;
     height: 43px;
     opacity: 0;
     position: absolute;
     bottom: -30px;
 }
+.ds4 .back  { left: 170px; }
+.ds4 .start { left: 546px; }
 
-.ds4 .back {
-    left: 170px;
-}
-
-.ds4 .start {
-    left: 546px;
-}
-
-.ds4 .back.pressed,
-.ds4 .start.pressed {
+.ds4 .back.pressed, .ds4 .start.pressed {
     opacity: 1;
-    filter: brightness(1.3);
+    filter: brightness(var(--pressed-brightness));
 }
 
 /* === ANALOG STICKS === */
@@ -284,48 +204,23 @@
     border-radius: 50%;
 }
 
-.ds4 .stick.left {
-    top: 0;
-    left: 0;
-}
+.ds4 .stick.left  { top: 0; left: 0; }
+.ds4 .stick.right { top: calc(100% - 105px); left: calc(100% - 105px); }
 
-.ds4 .stick.right {
-    top: calc(100% - 105px);
-    left: calc(100% - 105px);
-}
+.ds4 .stick.pressed.left  { background-position-x: -96px; }
+.ds4 .stick.pressed.right { background-position-x: -192px; }
 
-/* Stick pressed (clicked in) */
-.ds4 .stick.pressed.left {
-    background-position-x: -96px;
-}
-
-.ds4 .stick.pressed.right {
-    background-position-x: -192px;
-}
-
-/* === STICK MOVEMENT DETECTION === */
-/* Class-based approach (add via JS) */
-.ds4 .stick.moving {
-    filter: brightness(2) grayscale(0.5);
+/* === STICK MOVEMENT === */
+.ds4 .stick.moving,
+.ds4 .stick[style*="translate"]:not([style*="translate(0px, 0px)"]) {
+    filter: brightness(2) grayscale(1);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
 }
 
-/* Inline style fallback */
-.ds4 .stick[style*="translate"]:not([style*="translate(0"]) {
-    filter: brightness(2) grayscale(0.5);
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-}
+/* === VARIANTS === */
+.ds4.half { margin-top: -300px; }
 
-/* === HALF VIEW === */
-.ds4.half {
-    margin-top: -300px;
-}
-
-/* === WHITE CONTROLLER === */
-.ds4.white {
-    filter: invert(1) hue-rotate(180deg);
-}
-
+.ds4.white { filter: invert(1) hue-rotate(180deg); }
 .ds4.white .back,
 .ds4.white .start {
     background-image: url(Start.png);
