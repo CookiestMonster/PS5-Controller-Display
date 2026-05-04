@@ -3,8 +3,6 @@
     background: url(Black_SkinNo_Buttons.png);
     height: 700px;
     width: 1200px;
-    /*    margin-left: -403px;
-        margin-top: -280px;*/
 }
 
 /* === CUSTOM PROPERTIES === */
@@ -85,9 +83,11 @@
     position: absolute;
     left: 422px;
     top: 74px;
+    opacity: 0;
 }
 
 .ds4 .touchpad.pressed {
+    opacity: var(--pressed-opacity);
     background: url(Touchpad.png) no-repeat center;
     filter: brightness(var(--pressed-brightness));
 }
@@ -100,9 +100,11 @@
     left: 546px;
     bottom: 264px;
     border-radius: 50%;
+    opacity: 0;
 }
 
 .ds4 .meta.pressed {
+    opacity: var(--pressed-opacity);
     background: url(Home.png) no-repeat center;
     filter: brightness(var(--pressed-brightness));
 }
@@ -113,12 +115,7 @@
 .ds4 .p2 { background-position: 0 -49px; }
 .ds4 .p3 { background-position: 0 -70px; }
 
-/* === DPAD ===
-   No "no-repeat" on .face elements.
-   Left/right use background-repeat wrap-around with positive values:
-   DPad sprite columns: down=0, up=37, left=75, right=128
-   Wrap formula: image_width(179) - column_x = position
-   right: 179-128=51 (use 52), left: 179-75=104 */
+/* === DPAD === */
 .ds4 .dpad {
     position: absolute;
     width: 125px;
@@ -130,6 +127,7 @@
 .ds4 .face {
     background: url(DPad.png);
     position: absolute;
+    opacity: 0;
 }
 
 .ds4 .face.up,   .ds4 .face.down  { width: 36px; height: 52px; }
@@ -141,14 +139,12 @@
 .ds4 .face.right { top: 45px; right: 0;   background-position: 52px 0; }
 
 .ds4 .face.pressed {
+    opacity: var(--pressed-opacity);
     background-position-y: 52px;
     filter: brightness(1.4);
 }
 
-/* === FACE BUTTONS (ABXY) ===
-   No "no-repeat" on .button — triangle uses wrap-around (224-168=56~55px).
-   Sprite columns (56px each): X=0, Circle=56, Square=112, Triangle=168
-   Normal row y=0, Pressed row y=56 (use 55 for wrap trick) */
+/* === FACE BUTTONS (ABXY) === */
 .ds4 .abxy {
     position: absolute;
     width: 170px;
@@ -162,9 +158,11 @@
     background: url(Buttons.png);
     width: 56px;
     height: 56px;
+    opacity: 0;
 }
 
 .ds4 .button.pressed {
+    opacity: var(--pressed-opacity);
     background-position-y: 55px;
     filter: brightness(1.5);
 }
@@ -186,13 +184,11 @@
 .ds4 .start { position: absolute; left: 546px; bottom: -30px; float: right; background-position: 0 0; }
 
 .ds4 .back.pressed, .ds4 .start.pressed {
-    opacity: 1;
+    opacity: var(--pressed-opacity);
     filter: brightness(var(--pressed-brightness));
 }
 
-/* === ANALOG STICKS ===
-   Sprite: 286x94px, 3 sticks ~95px wide each
-   Col 0=normal, Col 1=left pressed (-96px), Col 2=right pressed (-192px) */
+/* === ANALOG STICKS === */
 .ds4 .sticks {
     position: absolute;
     width: 364px;
@@ -207,10 +203,15 @@
     height: 94px;
     width: 94px;
     border-radius: 50%;
+    opacity: 0;
 }
 
 .ds4 .stick.left  { top: 0; left: 0; }
 .ds4 .stick.right { top: calc(100% - 105px); left: calc(100% - 105px); }
+
+.ds4 .stick.pressed {
+    opacity: var(--pressed-opacity);
+}
 
 .ds4 .stick.pressed.left  { background-position-x: -96px; }
 .ds4 .stick.pressed.right { background-position-x: -192px; }
@@ -218,6 +219,7 @@
 /* === STICK MOVEMENT GLOW === */
 .ds4 .stick.moving,
 .ds4 .stick[style*="translate"]:not([style*="translate(0px, 0px)"]) {
+    opacity: var(--pressed-opacity);
     filter: brightness(2) grayscale(1);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
 }
