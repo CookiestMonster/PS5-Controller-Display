@@ -1,11 +1,4 @@
 /* === PS5 Controller CSS === */
-.controller.ds4 {
-    background: url(Black_SkinNo_Buttons.png);
-    height: 700px;
-    width: 1200px;
-    /*    margin-left: -403px;
-        margin-top: -280px;*/
-}
 
 /* === CUSTOM PROPERTIES === */
 .ds4 {
@@ -25,11 +18,18 @@
         background-position var(--transition-speed);
 }
 
+/* === BASE CONTROLLER === */
+.controller.ds4 {
+    background: url(Black_SkinNo_Buttons.png);
+    height: 700px;
+    width: 1200px;
+    position: relative;
+    user-select: none;
+}
+
 /* === DISCONNECTED STATE === */
-.ds4.disconnected {
-    filter: grayscale(1) brightness(0.6);
-    opacity: 0.5;
-    pointer-events: none;
+.ds4.disconnected div {
+    display: none;
 }
 
 /* === TRIGGERS === */
@@ -44,7 +44,7 @@
 .ds4 .trigger {
     width: 99px;
     height: 100%;
-    background: url(Trigger_Pressed.png) no-repeat / cover;
+    background: url(Trigger_Pressed.png);
     opacity: 0;
 }
 
@@ -68,7 +68,7 @@
 .ds4 .bumper {
     width: 200px;
     height: 45px;
-    background: url(Bumper.png) no-repeat / contain;
+    background: url(Bumper.png) no-repeat;
     opacity: 0;
 }
 
@@ -78,8 +78,8 @@
 .ds4 .bumper.pressed {
     opacity: var(--pressed-opacity);
     filter: brightness(var(--pressed-brightness));
-    transform: translateY(2px);
 }
+
 .ds4 .bumper.right.pressed { transform: rotateY(180deg) translateY(2px); }
 
 /* === TOUCHPAD === */
@@ -90,8 +90,9 @@
     left: 422px;
     top: 74px;
 }
+
 .ds4 .touchpad.pressed {
-    background: url(Touchpad.png) no-repeat center / contain;
+    background: url(Touchpad.png) no-repeat center;
     filter: brightness(var(--pressed-brightness));
 }
 
@@ -104,8 +105,9 @@
     bottom: 264px;
     border-radius: 50%;
 }
+
 .ds4 .meta.pressed {
-    background: url(Home.png) no-repeat center / contain;
+    background: url(Home.png) no-repeat center;
     filter: brightness(var(--pressed-brightness));
 }
 
@@ -124,18 +126,13 @@
     left: 286px;
 }
 
-.ds4 .face {
-    background: url(DPad.png) no-repeat;
-    position: absolute;
-}
-
 .ds4 .face.up, .ds4 .face.down { width: 36px; height: 52px; }
 .ds4 .face.left, .ds4 .face.right { width: 52px; height: 36px; }
 
 .ds4 .face.up    { left: 44px; top: 0;    background-position: -37px 0; }
 .ds4 .face.down  { left: 44px; bottom: 0; background-position: 0 0; }
-.ds4 .face.left  { top: 45px; left: 0;   background-position: 104px 0; }
-.ds4 .face.right { top: 45px; right: 0;  background-position: 52px 0; }
+.ds4 .face.left  { top: 45px; left: 0;    background-position: 104px 0; }
+.ds4 .face.right { top: 45px; right: 0;   background-position: 52px 0; }
 
 .ds4 .face.pressed {
     background-position-y: 52px;
@@ -151,33 +148,26 @@
     left: 762px;
 }
 
-.ds4 .button {
-    position: absolute;
-    background: url(Buttons.png) no-repeat;
-    width: 50px;
-    height: 50px;
-}
 .ds4 .button.pressed {
     background-position-y: 55px;
     filter: brightness(1.5);
 }
 
-.ds4 .a { background-position: 0 0;      bottom: 0;   left: 58px; }
-.ds4 .b { background-position: -57px 0;  top: 57px;   right: -3px; }
-.ds4 .x { background-position: -113px 0; top: 57px;   left: 0; }
-.ds4 .y { background-position: 55px 0;   top: 0;      left: 58px; }
+.ds4 .a { background-position: 0 0;      bottom: 0;      left: 58px; }
+.ds4 .b { background-position: -57px 0;  top: 57px;      right: -3px; }
+.ds4 .x { background-position: -113px 0; top: 57px; }
+.ds4 .y { background-position: 55px 0;   bottom: 119px;  left: 58px; }
 
 /* === START / SELECT BUTTONS === */
 .ds4 .back, .ds4 .start {
-    background: url(Select.png) no-repeat / contain;
+    background: url(Select.png);
     width: 26px;
     height: 43px;
     opacity: 0;
-    position: absolute;
-    bottom: -30px;
 }
-.ds4 .back  { left: 170px; }
-.ds4 .start { left: 546px; }
+
+.ds4 .back  { position: absolute; left: 170px; bottom: -30px; float: left; }
+.ds4 .start { position: absolute; left: 546px; bottom: -30px; float: right; background-position: 0 0; }
 
 .ds4 .back.pressed, .ds4 .start.pressed {
     opacity: 1;
@@ -195,8 +185,7 @@
 
 .ds4 .stick {
     position: absolute;
-    background: url(Sticks.png) no-repeat;
-    background-size: 288px 94px;
+    background: url(Sticks.png);
     height: 94px;
     width: 94px;
     border-radius: 50%;
