@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PS5 Controller Viewer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: transparent;
+            width: 1200px;
+            height: 698px;
+            overflow: hidden;
+        }
+
+        .controller {
+            background: url(Black_SkinNo_Buttons.png) no-repeat;
+            height: 698px;
+            width: 1200px;
+            position: relative;
+        }
+
+        .controller.disconnected div,
+        .controller.disconnected canvas { display: none; }
+
+        /* ── TRIGGERS ── */
+        .trigger {
+            position: absolute;
+            width: 100px;
+            height: 80px;
+            background: url(Trigger_Pressed.png) no-repeat;
+            opacity: 0;
+            top: 0;
+        }
+        .trigger.left  { left: 300px; top: 40px; background-position: 0 0; }
+        .trigger.right { left: 798px; top: 40px; background-position: -100px 0; }
+
+        /* ── BUMPERS ── */
+        .bumper {
+            position: absolute;
+            width: 200px;
+            height: 36px;
+            background: url(Bumper.png) no-repeat left center;
+            background-size: contain;
+            opacity: 0;
+        }
+        .bumper.left  { left: 265px; top: 130px; }
+        .bumper.right { left: 730px; top: 130px; transform: scaleX(-1); }
+        .bumper.pressed { opacity: 0.9; }
+
+        /* ── TOUCHPAD ── */
+        .touchpad {
+            position: absolute;
+            left: 435px;
+            top: 130px;
+            width: 325px;
+            height: 182px;
+            background: url(Touchpad.png) no-repeat center;
+            background-size: 100% 100%;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .touchpad.pressed { opacity: 0.9; filter: brightness(0) invert(1); }
+
+        /* ── PS BUTTON ── */
+        .meta {
+            position: absolute;
+            left: 558px;
+            top: 335px;
+            width: 76px;
+            height: 100px;
+        }
+        .meta.pressed {
+            background: url(Home.png) no-repeat center;
+            background-size: contain;
+        }
+
+        /* ── CREATE / OPTIONS ── */
+        .back, .start {
+            position: absolute;
+            width: 46px;
+            height: 46px;
+            opacity: 0;
+        }
+        .back {
+            background: url(Select.png) no-repeat center;
+            background-size: contain;
+            left: 387px; top: 172px;
+        }
+        .start {
+            background: url(Start.png) no-repeat center;
+            background-size: contain;
+            left: 763px; top: 172px;
+        }
+        .back.pressed, .start.pressed { opacity: 1; }
+
+        /* ── FACE BUTTONS ── */
+        .abxy {
+            position: absolute;
+            width: 172px;
+            height: 172px;
+            top: 199px;
+            left: 765px;
+        }
+        .button {
+            position: absolute;
+            width: 56px;
+            height: 56px;
+            background-image: url(Buttons.png);
+            background-repeat: no-repeat;
+            background-position-y: -57px;
+        }
+        .button.pressed { background-position-y: 0; }
+        .a { background-position-x:    0px; left: 58px; bottom: 0; }
+        .b { background-position-x:  -56px; top:  58px; right: 0;  }
+        .x { background-position-x: -113px; top:  58px; left: 0;   }
+        .y { background-position-x: -169px; top:  0;    left: 58px;}
+
+        /* ── ANALOG STICKS ── */
+        .stick {
+            position: absolute;
+            width: 94px;
+            height: 94px;
+            background: url(Sticks.png) no-repeat;
+            background-position-x: 0;
+        }
+        .stick.pressed.left  { background-position-x:  -96px; }
+        .stick.pressed.right { background-position-x: -192px; }
+        .stick.left  { left: 421px; top: 346px; }
+        .stick.right { left: 681px; top: 346px; }
+
+        /* ── STICK CANVAS VISUALIZERS ── */
+        .stick-canvas {
+            position: absolute;
+            pointer-events: none;
+        }
+        .stick-canvas.left  { left: 378px; top: 303px; }
+        .stick-canvas.right { left: 638px; top: 303px; }
+
+        /* ── DPAD ── */
+        .dpad {
+            position: absolute;
+            width: 128px;
+            height: 128px;
+            top: 205px;
+            left: 280px;
+        }
+        .face {
+            position: absolute;
+            background-image: url(DPad.png);
+            background-repeat: no-repeat;
+            background-position-y: -52px;
+        }
+        .face.up, .face.down { width: 37px; height: 52px; left: 46px; }
+        .face.left, .face.right { width: 52px; height: 36px; top: 46px; }
+        .face.down  { bottom: 0; background-position-x:    0px; }
+        .face.up    { top: 0;    background-position-x:  -37px; }
+        .face.right { right: 0;  background-position-x:  -75px; }
+        .face.left  { left: 0;   background-position-x: -128px; }
+        .face.pressed { background-position-y: 0; }
+
+        /* ── HUD OVERLAY ── */
+        #hud {
+            position: absolute;
+            top: 0; left: 0;
+            width: 1200px; height: 698px;
+            pointer-events: none;
+            font-family: ui-monospace, monospace;
+        }
+
+        /* Connection status pill */
+        #status {
+            position: absolute;
+            top: 8px; right: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0,0,0,0.55);
+            border-radius: 4px;
+            padding: 3px 7px;
+            font-size: 9px;
+            color: rgba(255,255,255,0.65);
+        }
+        #status-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        #status.connected #status-dot  { background: #4cff6e; }
+        #status.disconnected #status-dot {
+            background: #ff4c4c;
+            animation: blink 1s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.15; }
+        }
+
+        /* Polling rate — debug, sits below status pill */
+        #poll-rate {
+            position: absolute;
+            top: 33px; right: 8px;
+            background: rgba(0,0,0,0.45);
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: 9px;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* Input log */
+        #input-log {
+            position: absolute;
+            bottom: 200px; right: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .log-entry {
+            background: rgba(0,0,0,0.5);
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 9px;
+            color: rgba(255,255,255,0.7);
+            white-space: nowrap;
+        }
+        .log-entry .log-time { color: rgba(255,255,255,0.3); margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="controller" id="controller">
+
+    <div class="trigger left"  id="l2"></div>
+    <div class="trigger right" id="r2"></div>
+    <div class="bumper left"   id="l1"></div>
+    <div class="bumper right"  id="r1"></div>
+    <div class="touchpad"      id="touchpad"></div>
+    <div class="meta"          id="home"></div>
+    <div class="back"          id="select"></div>
+    <div class="start"         id="start"></div>
+
+    <div class="abxy">
+        <div class="button a" id="btn-a"></div>
+        <div class="button b" id="btn-b"></div>
+        <div class="button x" id="btn-x"></div>
+        <div class="button y" id="btn-y"></div>
+    </div>
+
+    <div class="dpad">
+        <div class="face up"    id="dpad-up"></div>
+        <div class="face down"  id="dpad-down"></div>
+        <div class="face left"  id="dpad-left"></div>
+        <div class="face right" id="dpad-right"></div>
+    </div>
+
+    <div class="stick left"  id="stick-left"></div>
+    <div class="stick right" id="stick-right"></div>
+
+    <canvas class="stick-canvas left"  id="canvas-left"  width="180" height="180"></canvas>
+    <canvas class="stick-canvas right" id="canvas-right" width="180" height="180"></canvas>
+
+</div>
+
+<!-- HUD lives outside .controller so it isn't hidden by the disconnected rule -->
+<div id="hud">
+    <div id="status" class="disconnected">
+        <div id="status-dot"></div>
+        <span id="status-text">NO CONTROLLER</span>
+    </div>
+    <div id="poll-rate" style="display:none">– Hz</div>
+    <div id="input-log"></div>
+</div>
+
+<script>
+    const BUTTONS = {
+        0:  document.getElementById('btn-a'),
+        1:  document.getElementById('btn-b'),
+        2:  document.getElementById('btn-x'),
+        3:  document.getElementById('btn-y'),
+        4:  document.getElementById('l1'),
+        5:  document.getElementById('r1'),
+        6:  document.getElementById('l2'),
+        7:  document.getElementById('r2'),
+        8:  document.getElementById('select'),
+        9:  document.getElementById('start'),
+        10: document.getElementById('stick-left'),
+        11: document.getElementById('stick-right'),
+        12: document.getElementById('dpad-up'),
+        13: document.getElementById('dpad-down'),
+        14: document.getElementById('dpad-left'),
+        15: document.getElementById('dpad-right'),
+        16: document.getElementById('home'),
+        17: document.getElementById('touchpad')
+    };
+
+    const stickL  = document.getElementById('stick-left');
+    const stickR  = document.getElementById('stick-right');
+    const ctrl    = document.getElementById('controller');
+    const ctxL    = document.getElementById('canvas-left').getContext('2d');
+    const ctxR    = document.getElementById('canvas-right').getContext('2d');
+
+    // ── Constants ──
+    const DEADZONE    = 0.10;
+    const STICK_RANGE = 28;
+    const TRAIL_MAX   = 26;
+    const TAU         = Math.PI * 2;
+    // Canvas geometry (shared by both visualisers)
+    const CW = 180, CH = 180, CX = 90, CY = 90, R = 72;
+    const DZ_R = R * DEADZONE;          // actual deadzone boundary in pixels
+
+    // Per-stick trail history
+    const trailL = [];
+    const trailR = [];
+
+    // ── HUD refs ──
+    const statusEl   = document.getElementById('status');
+    const statusText = document.getElementById('status-text');
+    const pollRateEl = document.getElementById('poll-rate');
+    const inputLogEl = document.getElementById('input-log');
+
+    // ── Polling rate (counts RAF frames per second, not just input-change frames) ──
+    var rafTimes       = [];
+    var pollFrameCount = 0;
+
+    // ── Input log ──
+    const LOG_MAX     = 6;
+    const inputLog    = [];
+    const prevPressed = {};
+    const BTN_NAMES   = {
+        0:'✕', 1:'○', 2:'□', 3:'△',
+        4:'L1', 5:'R1', 6:'L2', 7:'R2',
+        8:'Create', 9:'Options',
+        10:'L3', 11:'R3',
+        12:'↑', 13:'↓', 14:'←', 15:'→',
+        16:'PS', 17:'Touchpad'
+    };
+
+    function logPress(i) {
+        inputLog.push({ name: BTN_NAMES[i] || ('Btn' + i), ts: performance.now() });
+        if (inputLog.length > LOG_MAX) inputLog.shift();
+        renderLog();
+    }
+    function renderLog() {
+        inputLogEl.innerHTML = '';
+        for (var j = 0; j < inputLog.length; j++) {
+            var e   = inputLog[j];
+            var div = document.createElement('div');
+            div.className = 'log-entry';
+            if (j === 0) {
+                div.innerHTML = e.name;
+            } else {
+                var delta = ((e.ts - inputLog[j - 1].ts) / 1000).toFixed(2);
+                div.innerHTML = '<span class="log-time">+' + delta + 's</span>' + e.name;
+            }
+            inputLogEl.appendChild(div);
+        }
+    }
+
+    function setConnected(on) {
+        statusEl.className  = on ? 'connected' : 'disconnected';
+        statusText.textContent = on ? 'CONNECTED' : 'NO CONTROLLER';
+        pollRateEl.style.display = on ? '' : 'none';
+    }
+
+    let gpIndex = null;
+    let rafId   = null;
+
+    // ── Gamepad connection ──
+    window.addEventListener('gamepadconnected', function(e) {
+        gpIndex = e.gamepad.index;
+        ctrl.classList.remove('disconnected');
+        setConnected(true);
+        if (!rafId) loop();
+    });
+
+    window.addEventListener('gamepaddisconnected', function(e) {
+        if (e.gamepad.index !== gpIndex) return;
+        gpIndex = null;
+        ctrl.classList.add('disconnected');
+        setConnected(false);
+        cancelAnimationFrame(rafId);
+        rafId = null;
+        resetAll();
+    });
+
+    // ── Main loop ──
+    function loop() {
+        var gp = navigator.getGamepads()[gpIndex];
+        if (gp) {
+            // ── Polling rate (counts every RAF frame, not just input-change frames) ──
+            var now = performance.now();
+            rafTimes.push(now);
+            while (rafTimes.length && rafTimes[0] < now - 1000) rafTimes.shift();
+            if (++pollFrameCount % 20 === 0) {
+                pollRateEl.textContent = rafTimes.length + ' Hz';
+            }
+
+            for (var i = 0; i < gp.buttons.length; i++) {
+                var el = BUTTONS[i];
+                if (!el) continue;
+                var btn     = gp.buttons[i];
+                var value   = typeof btn === 'object' ? btn.value   : btn;
+                var pressed = typeof btn === 'object' ? btn.pressed  : (btn > 0.1);
+                if (i === 6 || i === 7) {                       // analog triggers
+                    var wasOn = prevPressed[i];
+                    var isOn  = value > 0.02;
+                    if (isOn && !wasOn) logPress(i);
+                    prevPressed[i] = isOn;
+                    el.classList.toggle('pressed', isOn);
+                    el.style.opacity = isOn ? value : 0;
+                    continue;
+                }
+                if (pressed && !prevPressed[i]) logPress(i);
+                prevPressed[i] = pressed;
+                el.classList.toggle('pressed', pressed);
+            }
+            moveStick(stickL, ctxL, trailL, gp.axes[0], gp.axes[1]);
+            moveStick(stickR, ctxR, trailR, gp.axes[2], gp.axes[3]);
+        }
+        rafId = requestAnimationFrame(loop);
+    }
+
+    // Fallback poll until a gamepad surfaces
+    function findGamepad() {
+        var gamepads = navigator.getGamepads();
+        for (var i = 0; i < gamepads.length; i++) {
+            if (gamepads[i]) {
+                gpIndex = i;
+                ctrl.classList.remove('disconnected');
+                setConnected(true);
+                if (!rafId) loop();
+                return;
+            }
+        }
+        requestAnimationFrame(findGamepad);
+    }
+    findGamepad();
+
+    // Initial draw
+    drawStickViz(ctxL, 0, 0, trailL);
+    drawStickViz(ctxR, 0, 0, trailR);
+
+    // ── Stick update ──
+    function moveStick(el, ctx, trail, axisX, axisY) {
+        var x = axisX || 0;
+        var y = axisY || 0;
+        var mag = Math.min(Math.sqrt(x * x + y * y), 1);
+        var dx  = Math.abs(x) < DEADZONE ? 0 : x;
+        var dy  = Math.abs(y) < DEADZONE ? 0 : y;
+
+        el.style.transform = 'translate(' + (dx * STICK_RANGE) + 'px,' + (dy * STICK_RANGE) + 'px)';
+        el.style.filter    = mag > 0 ? 'brightness(' + (1 + mag * 2) + ')' : '';
+
+        // Append to trail, evict oldest
+        trail.push({ x: x, y: y });
+        if (trail.length > TRAIL_MAX) trail.shift();
+
+        drawStickViz(ctx, x, y, trail);
+    }
+
+    // ── Visualiser ──
+    function drawStickViz(ctx, x, y, trail) {
+        ctx.clearRect(0, 0, CW, CH);
+
+        // Background fill + outer ring
+        ctx.beginPath();
+        ctx.arc(CX, CY, R, 0, TAU);
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Deadzone ring — dashed amber at actual DEADZONE boundary
+        ctx.save();
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.arc(CX, CY, DZ_R, 0, TAU);
+        ctx.strokeStyle = 'rgba(255,180,50,0.65)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+
+        // Crosshair (single compound path — one stroke call)
+        ctx.beginPath();
+        ctx.moveTo(CX - R, CY); ctx.lineTo(CX + R, CY);
+        ctx.moveTo(CX, CY - R); ctx.lineTo(CX, CY + R);
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Tick marks — batched into two paths (minor / major)
+        var a, ca, sa;
+        ctx.beginPath();
+        for (var t = 0; t < 36; t++) {
+            if (t % 9 === 0) continue;                          // skip major slots
+            a = (t / 36) * TAU; ca = Math.cos(a); sa = Math.sin(a);
+            ctx.moveTo(CX + ca * (R - 4), CY + sa * (R - 4));
+            ctx.lineTo(CX + ca * R,       CY + sa * R);
+        }
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        ctx.beginPath();
+        for (t = 0; t < 36; t += 9) {                          // only 4 major ticks
+            a = (t / 36) * TAU; ca = Math.cos(a); sa = Math.sin(a);
+            ctx.moveTo(CX + ca * (R - 8), CY + sa * (R - 8));
+            ctx.lineTo(CX + ca * R,       CY + sa * R);
+        }
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Pre-compute shared values
+        var mag        = Math.min(Math.sqrt(x * x + y * y), 1);
+        var angle      = Math.atan2(y, x) * 180 / Math.PI;
+        var inDeadzone = mag < DEADZONE;
+        var dotX       = CX + x * R;
+        var dotY       = CY + y * R;
+        var dotColor   = inDeadzone
+            ? 'rgba(180,180,180,0.6)'
+            : 'hsl(' + (120 - mag * 120) + ',100%,60%)';
+
+        // ── Clip everything dynamic inside the circle ──
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(CX, CY, R - 0.5, 0, TAU);
+        ctx.clip();
+
+        // Trail — fading dots, oldest→newest
+        if (trail && trail.length > 1) {
+            var tlen = trail.length;
+            for (var i = 0; i < tlen - 1; i++) {           // skip last (drawn as main dot)
+                var tp       = trail[i];
+                var progress = i / tlen;                    // 0 = oldest, ~1 = newest
+                ctx.beginPath();
+                ctx.arc(CX + tp.x * R, CY + tp.y * R, 1.5 + progress * 2.5, 0, TAU);
+                ctx.fillStyle = 'rgba(100,220,100,' + (progress * 0.45).toFixed(2) + ')';
+                ctx.fill();
+            }
+        }
+
+        // Direction line
+        if (!inDeadzone) {
+            ctx.beginPath();
+            ctx.moveTo(CX, CY);
+            ctx.lineTo(dotX, dotY);
+            ctx.strokeStyle = 'rgba(100,220,100,0.45)';
+            ctx.lineWidth   = 1.5;
+            ctx.stroke();
+        }
+
+        // Main dot — with glow
+        ctx.shadowBlur  = 12;
+        ctx.shadowColor = dotColor;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, 5, 0, TAU);
+        ctx.fillStyle = dotColor;
+        ctx.fill();
+        ctx.shadowBlur = 0;         // always reset so glow doesn't bleed onto labels
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+        ctx.lineWidth   = 1.2;
+        ctx.stroke();
+
+        ctx.restore();  // end clip
+
+        // ── Labels (drawn outside clip so they never get cropped) ──
+        var dimGrey = 'rgba(180,180,180,0.7)';
+
+        ctx.font      = 'bold 9px ui-monospace,monospace';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = inDeadzone ? dimGrey : '#7fff7f';
+        ctx.fillText(Math.round(mag * 100) + '%', CX, 11);
+
+        ctx.fillStyle = inDeadzone ? dimGrey : '#7fd4ff';
+        ctx.fillText((inDeadzone ? 0 : Math.round(angle)) + '\u00b0', CX, CH - 2);
+
+        ctx.textAlign = 'left';
+        ctx.font      = '8px ui-monospace,monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText('X', 2, CY - 4);
+        ctx.font      = 'bold 9px ui-monospace,monospace';
+        ctx.fillStyle = Math.abs(x) > DEADZONE ? '#fff' : 'rgba(160,160,160,0.5)';
+        ctx.fillText(x.toFixed(2), 2, CY + 9);
+
+        ctx.textAlign = 'right';
+        ctx.font      = '8px ui-monospace,monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText('Y', CW - 2, CY - 4);
+        ctx.font      = 'bold 9px ui-monospace,monospace';
+        ctx.fillStyle = Math.abs(y) > DEADZONE ? '#fff' : 'rgba(160,160,160,0.5)';
+        ctx.fillText(y.toFixed(2), CW - 2, CY + 9);
+
+        ctx.font      = '8px ui-monospace,monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.textAlign = 'center';
+        ctx.fillText('+1', CX,     CY + R - 4);
+        ctx.fillText('-1', CX,     CY - R + 12);
+        ctx.textAlign = 'left';
+        ctx.fillText('-1', CX - R + 2, CY + 4);
+        ctx.textAlign = 'right';
+        ctx.fillText('+1', CX + R - 2, CY + 4);
+    }
+
+    // ── Reset on disconnect ──
+    function resetAll() {
+        trailL.length = 0;
+        trailR.length = 0;
+        rafTimes.length  = 0;
+        inputLog.length  = 0;
+        renderLog();
+        pollRateEl.textContent = '– Hz';
+        for (var key in prevPressed) delete prevPressed[key];
+        for (var key in BUTTONS) {
+            var el = BUTTONS[key];
+            if (!el) continue;
+            el.classList.remove('pressed');
+            el.style.opacity   = '';
+            el.style.transform = '';
+            el.style.filter    = '';
+        }
+        drawStickViz(ctxL, 0, 0, trailL);
+        drawStickViz(ctxR, 0, 0, trailR);
+    }
+</script>
+
+</body>
+</html>
